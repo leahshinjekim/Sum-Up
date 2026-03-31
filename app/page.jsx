@@ -151,7 +151,7 @@ export default function Home() {
                   <TableCell>{item.subject || "-"}</TableCell>
                   <TableCell>{item.header?.lecture_title || "-"}</TableCell>
                   <TableCell>{item.header?.topic || "-"}</TableCell>
-                  <TableCell>{item.createdAt}</TableCell>
+                <TableCell sx={{ whiteSpace: "nowrap" }}>{new Date(item.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</TableCell>
                   <TableCell align="right">
                     <Box
                       sx={{
