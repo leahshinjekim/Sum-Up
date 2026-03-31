@@ -127,6 +127,14 @@ const theme = createTheme({
       textTransform: "none",
       letterSpacing: "0.01em",
     },
+    hero: {
+      fontFamily: "'Alegreya Sans', sans-serif",
+      fontSize: "3rem",
+      fontWeight: 400,
+      lineHeight: 1.2,
+      color: "#4e4e4e",
+      letterSpacing: "-0.02em",
+    },
   },
 
   // ── SHAPE ─────────────────────────────────────────────────────────────────

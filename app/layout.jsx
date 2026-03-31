@@ -1,5 +1,4 @@
 import ThemeRegistry from "./ThemeRegistry";
-import Navbar from "@/components/Navbar";
 
 export const metadata = {
   title: "Sum-Up",
@@ -10,10 +9,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <ThemeRegistry>
-          {/* <Navbar /> */}
-          {children}
-        </ThemeRegistry>
+        <ThemeRegistry>{children}</ThemeRegistry>
       </body>
     </html>
   );
