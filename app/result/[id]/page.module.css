@@ -1,0 +1,94 @@
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 5rem 2rem;
+  color: #8a7e76;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.title {
+  margin-bottom: 0.25rem !important;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 0.75rem;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #7a7a7a;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: color 0.15s;
+}
+
+.backBtn:hover {
+  color: #1c1814;
+}
+
+.banner {
+  background-color: #edf7f1 !important;
+  border: 1px solid #a8d5ba !important;
+  border-radius: 10px !important;
+  margin-bottom: 1.75rem !important;
+  transition: none !important;
+  padding: 0.75rem !important;
+}
+
+.banner:hover {
+  box-shadow: none !important;
+}
+
+.contentCard {
+  min-height: 200px;
+  margin-bottom: 0 !important; /* copy row sits right below */
+}
+
+.contentText {
+  white-space: pre-wrap;
+  font-family: "DM Sans", sans-serif !important;
+  font-size: 0.95rem !important;
+  line-height: 1.85 !important;
+  color: #3a342e !important;
+  margin: 0;
+}
+
+.copyRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 1.5rem 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

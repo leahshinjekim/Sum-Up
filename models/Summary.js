@@ -1,15 +1,43 @@
 import mongoose from "mongoose";
 
-const SummarySchema = new mongoose.Schema({
-  subject: { type: String },
-  topic: { type: String },
-  transcript: { type: String, required: true },
-  overview: { type: String },
-  keyConcepts: { type: String },
-  examPoints: { type: String },
-  glossary: { type: String },
-  createdAt: { type: Date, default: Date.now },
-});
+const HeaderSchema = new mongoose.Schema(
+  {
+    lecture_title: { type: String, required: true },
+    topic: { type: String, required: true },
+    learning_goals: { type: [String], default: [] },
+  },
+  { _id: false },
+);
 
-export default mongoose.models.Summary ||
-  mongoose.model("Summary", SummarySchema);
+const MainPointSchema = new mongoose.Schema(
+  {
+    cue: { type: String, required: true },
+    summary: { type: String, required: true },
+  },
+  { _id: false },
+);
+
+const ReviewQuestionSchema = new mongoose.Schema(
+  {
+    question: { type: String, required: true },
+  },
+  { _id: false },
+);
+
+const SummarySchema = new mongoose.Schema(
+  {
+    subject: { type: String },
+    header: { type: HeaderSchema, required: true },
+    main_points: { type: [MainPointSchema], required: true },
+    takeaway: { type: String, required: true },
+    review_questions: { type: [ReviewQuestionSchema], default: [] },
+  },
+  {
+    timestamps: true,
+  },
+);
+
+const Summary =
+  mongoose.models.Summary || mongoose.model("Summary", SummarySchema);
+
+export default Summary;
