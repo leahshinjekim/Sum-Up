@@ -16,24 +16,21 @@ const UploadPage = () => {
   const router = useRouter();
 
   const [transcript, setTranscript] = useState("");
-  const [transcriptFileName, setTranscriptFileName] = useState("");
+  const [transcriptFiles, setTranscriptFiles] = useState([]);
   const [materials, setMaterials] = useState("");
-  const [materialsFileName, setMaterialsFileName] = useState("");
+  const [materialsFiles, setMaterialsFiles] = useState([]);
   const [subject, setSubject] = useState("");
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const canSubmit = transcript.trim().length > 0 && !loading;
+  const canSubmit =
+    (transcript.trim().length > 0 || transcriptFiles.length > 0) &&
+    subject.trim().length > 0 &&
+    topic.trim().length > 0 &&
+    !loading;
 
-  const handleTranscriptFile = (name, content) => {
-    setTranscriptFileName(name);
-    setTranscript(content);
-  };
-
-  const handleMaterialsFile = (name, content) => {
-    setMaterialsFileName(name);
-    setMaterials(content);
-  };
+  const handleTranscriptFile = (files) => setTranscriptFiles(files);
+  const handleMaterialsFile = (files) => setMaterialsFiles(files);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -41,7 +38,18 @@ const UploadPage = () => {
       const res = await fetch("/api/summarise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript, materials, subject, topic }),
+        body: JSON.stringify({
+          transcript:
+            transcriptFiles.length > 0
+              ? transcriptFiles.map((f) => f.content).join("\n\n")
+              : transcript,
+          materials:
+            materialsFiles.length > 0
+              ? materialsFiles.map((f) => f.content).join("\n\n")
+              : materials,
+          subject,
+          topic,
+        }),
       });
       const data = await res.json();
       if (data.success) {
@@ -78,7 +86,8 @@ const UploadPage = () => {
           <div className={styles.contextGrid}>
             <div>
               <Typography variant="overline" component="label">
-                Subject / Course
+                Subject / Course{" "}
+                <span style={{ color: theme.palette.primary.main }}>*</span>
               </Typography>
               <TextField
                 fullWidth
@@ -92,7 +101,8 @@ const UploadPage = () => {
             </div>
             <div>
               <Typography variant="overline" component="label">
-                Lecture Topic
+                Lecture Topic{" "}
+                <span style={{ color: theme.palette.primary.main }}>*</span>
               </Typography>
               <TextField
                 fullWidth
@@ -131,8 +141,8 @@ const UploadPage = () => {
           <FileDropZone
             label="Upload transcript file (.txt, .docx, .pdf)"
             accept=".txt,.doc,.docx"
-            fileName={transcriptFileName}
-            onFileRead={handleTranscriptFile}
+            files={transcriptFiles}
+            onFilesChange={setTranscriptFiles}
             variant="primary"
           />
 
@@ -150,7 +160,8 @@ const UploadPage = () => {
             value={transcript}
             onChange={(e) => {
               setTranscript(e.target.value);
-              if (e.target.value === "") setTranscriptFileName("");
+              if (e.target.value === "") setTranscriptFiles([]);
+              else setTranscriptFiles([]);
             }}
             placeholder="Paste your lecture transcript here..."
           />
@@ -174,7 +185,7 @@ const UploadPage = () => {
               style={{
                 color: theme.palette.secondary.dark,
                 fontSize: "1rem",
-                fontWeight: 400,
+                fontWeight: 500,
               }}
             >
               {" "}
@@ -189,8 +200,8 @@ const UploadPage = () => {
           <FileDropZone
             label="Upload course materials (slides, readings, books, etc.)"
             accept=".txt,.doc,.docx"
-            fileName={materialsFileName}
-            onFileRead={handleMaterialsFile}
+            files={materialsFiles}
+            onFilesChange={setMaterialsFiles}
             variant="secondary"
           />
 
@@ -208,7 +219,8 @@ const UploadPage = () => {
             value={materials}
             onChange={(e) => {
               setMaterials(e.target.value);
-              if (e.target.value === "") setMaterialsFileName("");
+              if (e.target.value === "") setMaterialsFiles([]);
+              else setMaterialsFiles([]);
             }}
             placeholder="Paste your lecture slides, readings, or subject outline here..."
             sx={{

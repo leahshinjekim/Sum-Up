@@ -178,7 +178,7 @@ export default function Home() {
 
           <Box sx={{ mt: { xs: 4, md: 6 } }}>
             <Button
-              variant="outlined"
+              variant="contained"
               color="primary"
               href="/upload"
               sx={{ fontSize: { xs: 16, md: 20 }, borderRadius: "999px" }}
