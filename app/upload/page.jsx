@@ -17,6 +17,8 @@ const UploadPage = () => {
 
   const [transcript, setTranscript] = useState("");
   const [transcriptFiles, setTranscriptFiles] = useState([]);
+  const [slides, setSlides] = useState("");
+  const [slidesFiles, setSlidesFiles] = useState([]);
   const [materials, setMaterials] = useState("");
   const [materialsFiles, setMaterialsFiles] = useState([]);
   const [subject, setSubject] = useState("");
@@ -43,6 +45,10 @@ const UploadPage = () => {
             transcriptFiles.length > 0
               ? transcriptFiles.map((f) => f.content).join("\n\n")
               : transcript,
+          slides:
+            slidesFiles.length > 0
+              ? slidesFiles.map((f) => f.content).join("\n\n")
+              : slides,
           materials:
             materialsFiles.length > 0
               ? materialsFiles.map((f) => f.content).join("\n\n")
@@ -176,11 +182,11 @@ const UploadPage = () => {
         </CardContent>
       </Card>
 
-      {/* Materials */}
+      {/* Slides */}
       <Card>
         <CardContent>
           <Typography variant="h3">
-            Course materials
+            Lecture slides
             <span
               style={{
                 color: theme.palette.secondary.dark,
@@ -193,8 +199,76 @@ const UploadPage = () => {
             </span>
           </Typography>
           <Typography variant="body2" sx={{ mt: 0.5, mb: 1.5 }}>
-            Upload files or paste lecture slides, readings and other course
-            materials for more context
+            Upload your lecture slides for additional context.
+          </Typography>
+
+          <FileDropZone
+            label="Upload lecture slides (.txt, .docx, .pdf)"
+            accept=".txt,.doc,.docx"
+            files={slidesFiles}
+            onFilesChange={setSlidesFiles}
+            variant="secondary"
+          />
+
+          <div className={styles.divider}>
+            <div className={styles.dividerLine} />
+            <span className={styles.dividerText}>or paste directly</span>
+            <div className={styles.dividerLine} />
+          </div>
+
+          <TextField
+            fullWidth
+            multiline
+            rows={6}
+            variant="outlined"
+            value={slides}
+            onChange={(e) => {
+              setSlides(e.target.value);
+              if (e.target.value === "") setSlidesFiles([]);
+              else setSlidesFiles([]);
+            }}
+            placeholder="Paste your lecture slides content here..."
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: theme.palette.secondary.main,
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: theme.palette.secondary.main,
+                },
+              },
+            }}
+          />
+          {slides && (
+            <Typography
+              variant="caption"
+              sx={{ display: "block", textAlign: "right", mt: 0.5 }}
+            >
+              {slides.trim().split(/\s+/).length} words
+            </Typography>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Other Materials */}
+      <Card>
+        <CardContent>
+          <Typography variant="h3">
+            Other learning materials
+            <span
+              style={{
+                color: theme.palette.custom.accent.dark,
+                fontSize: "1rem",
+                fontWeight: 500,
+              }}
+            >
+              {" "}
+              (for enhanced summarisation)
+            </span>
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 0.5, mb: 1.5 }}>
+            Upload files or paste papers, readings and other learning materials
+            for additional context
           </Typography>
 
           <FileDropZone
@@ -202,7 +276,7 @@ const UploadPage = () => {
             accept=".txt,.doc,.docx"
             files={materialsFiles}
             onFilesChange={setMaterialsFiles}
-            variant="secondary"
+            variant="tertiary"
           />
 
           <div className={styles.divider}>
@@ -226,10 +300,10 @@ const UploadPage = () => {
             sx={{
               "& .MuiOutlinedInput-root": {
                 "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: theme.palette.secondary.main,
+                  borderColor: theme.palette.custom.accent.main,
                 },
                 "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: theme.palette.secondary.main,
+                  borderColor: theme.palette.custom.accent.main,
                 },
               },
             }}

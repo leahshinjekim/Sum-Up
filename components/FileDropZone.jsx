@@ -11,6 +11,8 @@ const FileDropZone = ({ label, accept, files, onFilesChange, variant }) => {
   const accentColor =
     variant === "secondary"
       ? theme.palette.secondary.main
+      : variant === "tertiary"
+      ? theme.palette.custom.accent.main
       : theme.palette.primary.main;
 
   const readAndAppend = (fileList) => {

@@ -41,6 +41,12 @@ const theme = createTheme({
 
     // Custom tokens
     custom: {
+      accent: {
+        light: "#5b9cf6",
+        main: "#2d7dd2",
+        dark: "#1a5ca8",
+        contrastText: "#ffffff",
+      },
       sand: "#e8e8e8",
       sandDark: "#e0d0dc",
       muted: "#7a7a7a",

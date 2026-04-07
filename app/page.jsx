@@ -202,7 +202,7 @@ export default function Home() {
             cardDistance={60}
             verticalDistance={70}
             width={500}
-            height={400}
+            height={250}
             pauseOnHover={false}
           >
             {featureCards.map((card, i) => (
