@@ -10,7 +10,9 @@ import {
   TableRow,
   TableCell,
   TableContainer,
+  useMediaQuery,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/navigation";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import CardSwap, { Card } from "@/components/CardSwap/CardSwap";
@@ -18,6 +20,8 @@ import theme from "@/styles/theme";
 
 export default function Home() {
   const router = useRouter();
+  const theme = useTheme();
+  const isMd = useMediaQuery(theme.breakpoints.down("md"));
   const [summaryHistory, setSummaryHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -128,9 +132,9 @@ export default function Home() {
     <Box
       sx={{
         maxWidth: 1200,
-        mx: { xs: 2, sm: 12 },
+        mx: "auto",
         px: { xs: 2, sm: 4 },
-        py: { xs: 3, sm: 5 },
+        py: { xs: 4, sm: 5 },
       }}
     >
       <Box
@@ -147,14 +151,10 @@ export default function Home() {
             display: "flex",
             flexDirection: "column",
             alignItems: { xs: "center", md: "flex-start" },
-            justifyContent: { xs: "center", md: "flex-start" },
+            justifyContent: "flex-start",
             textAlign: { xs: "center", md: "left" },
             flex: 1,
-            minHeight: { xs: "none", md: "100vh" },
-            mb: {
-              xs: 4,
-              md: 0,
-            },
+            minHeight: "100vh",
           }}
         >
           <img
@@ -170,6 +170,7 @@ export default function Home() {
             sx={{
               fontSize: { xs: "1.6rem", sm: "2rem", md: "2.4rem" },
               lineHeight: 1.3,
+              mt: { xs: 4, md: 6 },
             }}
           >
             Your study assistant that helps turn study materials into insightful
@@ -181,7 +182,11 @@ export default function Home() {
               variant="contained"
               color="primary"
               href="/upload"
-              sx={{ fontSize: { xs: 16, md: 20 }, borderRadius: "999px" }}
+              sx={{
+                fontSize: { xs: 16, md: 20 },
+                borderRadius: "999px",
+                textAlign: "center",
+              }}
             >
               ✦ Start summarisation
             </Button>
@@ -253,16 +258,100 @@ export default function Home() {
         </Typography>
       </Box>
 
-      <TableContainer sx={{ overflowX: "auto" }}>
-        {loading ? (
-          <Typography variant="body2" sx={{ p: 6, textAlign: "center" }}>
-            Loading summaries...
-          </Typography>
-        ) : summaryHistory.length === 0 ? (
-          <Typography variant="body2" sx={{ p: 6, textAlign: "center" }}>
-            No summaries yet. Upload your first lecture!
-          </Typography>
-        ) : (
+      {loading ? (
+        <Typography variant="body2" sx={{ p: 6, textAlign: "center" }}>
+          Loading summaries...
+        </Typography>
+      ) : summaryHistory.length === 0 ? (
+        <Typography variant="body2" sx={{ p: 6, textAlign: "center" }}>
+          No summaries yet. Start generating your first summary!
+        </Typography>
+      ) : isMd ? (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {summaryHistory.map((item) => (
+            <Box
+              key={item._id}
+              sx={{
+                backgroundColor: "background.paper",
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 3,
+                p: 2.5,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  mb: 1,
+                }}
+              >
+                <Box>
+                  <Typography variant="h4">
+                    {item.header?.lecture_title || "-"}
+                  </Typography>
+                  {item.subject && (
+                    <Box
+                      sx={{
+                        mt: 1,
+                        display: "inline-block",
+                        backgroundColor: "#fcdaf3",
+                        borderRadius: "999px",
+                        px: 1.5,
+                        py: 0.25,
+                      }}
+                    >
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontWeight: 600,
+                          color: theme.palette.primary.main,
+                        }}
+                      >
+                        {item.subject}
+                      </Typography>
+                    </Box>
+                  )}
+                  <Typography variant="body2" sx={{ mt: 1, mb: 1 }}>
+                    {item.header?.topic || "-"}
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="caption"
+                  sx={{ whiteSpace: "nowrap", ml: 1 }}
+                >
+                  {new Date(item.createdAt).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Button
+                  variant="contained"
+                  color="info"
+                  size="small"
+                  onClick={() => handleView(item)}
+                >
+                  View
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  size="small"
+                  onClick={() => handleDeleteClick(item)}
+                >
+                  Delete
+                </Button>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      ) : (
+        <TableContainer sx={{ overflowX: "auto" }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -290,6 +379,7 @@ export default function Home() {
                     <Box
                       sx={{
                         display: "flex",
+                        flexDirection: { md: "column", lg: "row" },
                         gap: 1,
                         justifyContent: "flex-end",
                       }}
@@ -316,8 +406,8 @@ export default function Home() {
               ))}
             </TableBody>
           </Table>
-        )}
-      </TableContainer>
+        </TableContainer>
+      )}
 
       <ConfirmDialog
         open={!!deleteTarget}

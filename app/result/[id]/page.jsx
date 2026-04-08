@@ -75,8 +75,8 @@ export default function ResultsPage() {
       return (summary.header?.learning_goals ?? []).join("\n");
     if (activeTab === "main_points")
       return (summary.main_points ?? [])
-        .map((p) => `${p.cue}\n${p.summary}`)
-        .join("\n\n");
+        .map((p) => `${p.cue}\n${p.summary}\n${p.example}`)
+        .join("\n\n\n");
     if (activeTab === "takeaway") return summary.takeaway ?? "";
     if (activeTab === "review_questions")
       return (summary.review_questions ?? [])
@@ -96,8 +96,16 @@ export default function ResultsPage() {
     if (activeTab === "main_points") {
       return (summary.main_points ?? []).map((point, i) => (
         <Box key={i} sx={{ mb: 2 }}>
-          <Typography variant="h6">{point.cue}</Typography>
+          <Typography variant="h5">{point.cue}</Typography>
           <Typography variant="body1">{point.summary}</Typography>
+          {point.example && (
+            <Typography variant="body1">
+              <strong style={{ color: theme.palette.primary.main }}>
+                Example:
+              </strong>{" "}
+              {point.example}
+            </Typography>
+          )}
         </Box>
       ));
     }
@@ -131,28 +139,20 @@ export default function ResultsPage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            gap: 8,
             width: "100%",
           }}
         >
           <Typography variant="h1" className={styles.title}>
             {summary.header?.lecture_title || summary.header?.topic}
           </Typography>
-
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => router.push("/upload")}
-            sx={{ flexShrink: 0 }}
-          >
-            + New summary
-          </Button>
         </Box>
 
         <Chip
           label={summary.subject}
           color="info"
           size="medium"
-          sx={{ mt: 0.5, fontSize: 14 }}
+          sx={{ mt: 0.5, fontSize: 14, maxWidth: 250, alignSelf: "flex-start" }}
         />
       </div>
 
@@ -177,7 +177,17 @@ export default function ResultsPage() {
         onChange={(_, newVal) => setActiveTab(newVal)}
         variant="scrollable"
         scrollButtons="auto"
-        sx={{ mb: 2 }}
+        sx={{
+          mb: 2,
+          [theme.breakpoints.down("sm")]: {
+            "& .MuiTabs-flexContainer": {
+              flexWrap: "wrap",
+            },
+            "& .MuiTabs-indicator": {
+              display: "none",
+            },
+          },
+        }}
       >
         {TabHeaders.map((tab) => (
           <Tab key={tab.id} value={tab.id} label={tab.label} />

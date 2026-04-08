@@ -145,8 +145,8 @@ const UploadPage = () => {
           </Typography>
 
           <FileDropZone
-            label="Upload transcript file (.txt, .docx, .pdf)"
-            accept=".txt,.doc,.docx"
+            label="Upload transcript file (.txt, .pdf, .srt)"
+            accept=".txt,.pdf,.srt"
             files={transcriptFiles}
             onFilesChange={setTranscriptFiles}
             variant="primary"
@@ -203,8 +203,8 @@ const UploadPage = () => {
           </Typography>
 
           <FileDropZone
-            label="Upload lecture slides (.txt, .docx, .pdf)"
-            accept=".txt,.doc,.docx"
+            label="Upload lecture slides (.ppt, .pptx, .pdf)"
+            accept=".ppt, .pptx, .pdf"
             files={slidesFiles}
             onFilesChange={setSlidesFiles}
             variant="secondary"
@@ -272,8 +272,8 @@ const UploadPage = () => {
           </Typography>
 
           <FileDropZone
-            label="Upload course materials (slides, readings, books, etc.)"
-            accept=".txt,.doc,.docx"
+            label="Upload course materials (readings, books, etc.)"
+            accept=".txt,.docx,.pdf"
             files={materialsFiles}
             onFilesChange={setMaterialsFiles}
             variant="tertiary"

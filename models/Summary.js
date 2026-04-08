@@ -13,6 +13,8 @@ const MainPointSchema = new mongoose.Schema(
   {
     cue: { type: String, required: true },
     summary: { type: String, required: true },
+    example: { type: String, required: true },
+    evidence: { type: String, required: true },
   },
   { _id: false },
 );
