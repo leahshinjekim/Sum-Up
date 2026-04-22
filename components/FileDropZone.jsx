@@ -1,6 +1,8 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useTheme } from "@mui/material/styles";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import styles from "./FileDropZone.module.css";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 
@@ -14,6 +16,7 @@ const FileDropZone = ({
 }) => {
   const inputRef = useRef(null);
   const theme = useTheme();
+  const [dupeError, setDupeError] = useState(false);
 
   const accentColor =
     variant === "secondary"
@@ -23,7 +26,14 @@ const FileDropZone = ({
       : theme.palette.primary.main;
 
   const appendFiles = (fileList) => {
-    const newFiles = Array.from(fileList);
+    const incoming = Array.from(fileList);
+    const newFiles = incoming.filter(
+      (f) => !(files || []).some((existing) => existing.name === f.name && existing.size === f.size)
+    );
+    if (newFiles.length < incoming.length) {
+      setDupeError(true);
+      setTimeout(() => setDupeError(false), 3000);
+    }
     if (!newFiles.length) return;
 
     if (multiple) {
@@ -62,6 +72,18 @@ const FileDropZone = ({
         style={{ display: "none" }}
         onChange={handleChange}
       />
+      {dupeError && (
+        <Snackbar
+          open={dupeError}
+          autoHideDuration={3000}
+          onClose={() => setDupeError(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert severity="error" onClose={() => setDupeError(false)}>
+            This file has already been uploaded.
+          </Alert>
+        </Snackbar>
+      )}
 
       {!hasFiles ? (
         <div
