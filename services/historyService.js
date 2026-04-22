@@ -28,6 +28,18 @@ export async function getSummaryById(id) {
   });
 }
 
+export async function updateSummary(id, { subject, lecture_title }) {
+  return withDB(async () => {
+    const updated = await Summary.findByIdAndUpdate(
+      id,
+      { subject, "header.lecture_title": lecture_title },
+      { new: true, lean: true },
+    );
+    if (!updated) return null;
+    return { ...updated, _id: updated._id.toString() };
+  });
+}
+
 export async function deleteSummary(id) {
   return withDB(async () => {
     const deleted = await Summary.findByIdAndDelete(id).lean();

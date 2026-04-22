@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import { useRouter, useParams } from "next/navigation";
+import { Document, Packer, Paragraph, TextRun, AlignmentType } from "docx";
+import { saveAs } from "file-saver";
 import { useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -11,11 +13,8 @@ import Chip from "@mui/material/Chip";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import CircularProgress from "@mui/material/CircularProgress";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import CheckIcon from "@mui/icons-material/Check";
 import Box from "@mui/material/Box";
+import DownloadIcon from "@mui/icons-material/Download";
 
 const TabHeaders = [
   { id: "learningGoals", label: "Leaning Goals" },
@@ -32,7 +31,6 @@ export default function ResultsPage() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("learningGoals");
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -70,19 +68,146 @@ export default function ResultsPage() {
     );
   }
 
-  function getPlainText() {
-    if (activeTab === "learningGoals")
-      return (summary.header?.learning_goals ?? []).join("\n");
-    if (activeTab === "main_points")
-      return (summary.main_points ?? [])
-        .map((p) => `${p.cue}\n${p.summary}\n${p.example}`)
-        .join("\n\n\n");
-    if (activeTab === "takeaway") return summary.takeaway ?? "";
-    if (activeTab === "review_questions")
-      return (summary.review_questions ?? [])
-        .map((q) => (typeof q === "string" ? q : q.question))
-        .join("\n");
-    return "";
+  async function handleDownload() {
+    const title =
+      summary.header?.lecture_title || summary.header?.topic || "Summary";
+
+    const sectionHeading = (text) =>
+      new Paragraph({
+        style: "SectionHeading",
+        children: [new TextRun({ text: text.toUpperCase() })],
+        spacing: { before: 400, after: 160 },
+        border: {
+          bottom: { style: "single", size: 6, color: "BB2693", space: 6 },
+        },
+      });
+
+    const cueHeading = (text) =>
+      new Paragraph({
+        style: "CueHeading",
+        children: [new TextRun({ text })],
+        spacing: { before: 240, after: 80 },
+      });
+
+    const bodyPara = (text, opts = {}) =>
+      new Paragraph({
+        style: "BodyText",
+        children: [new TextRun({ text, ...opts })],
+        spacing: { after: 100 },
+      });
+
+    const numberedPara = (text, i) =>
+      new Paragraph({
+        style: "BodyText",
+        children: [new TextRun({ text: `${i + 1}.  ${text}` })],
+        spacing: { after: 80 },
+        indent: { left: 360 },
+      });
+
+    const children = [
+      // Title block
+      new Paragraph({
+        style: "DocTitle",
+        children: [new TextRun({ text: title })],
+        spacing: { after: 120 },
+        alignment: AlignmentType.LEFT,
+      }),
+      new Paragraph({
+        style: "SubjectTag",
+        children: [new TextRun({ text: summary.subject || "" })],
+        spacing: { after: 400 },
+      }),
+
+      // Learning Goals
+      sectionHeading("Learning Goals"),
+      ...(summary.header?.learning_goals ?? []).map((g, i) =>
+        numberedPara(g, i),
+      ),
+
+      // Summary
+      sectionHeading("Summary"),
+      ...(summary.main_points ?? []).flatMap((p) => [
+        cueHeading(p.cue),
+        bodyPara(p.summary),
+        ...(p.example
+          ? [
+              new Paragraph({
+                style: "BodyText",
+                children: [
+                  new TextRun({
+                    text: "Example:  ",
+                    bold: true,
+                    color: "BB2693",
+                  }),
+                  new TextRun({ text: p.example }),
+                ],
+                spacing: { after: 100 },
+                indent: { left: 360 },
+              }),
+            ]
+          : []),
+      ]),
+
+      // Takeaway
+      sectionHeading("Takeaway"),
+      bodyPara(summary.takeaway || ""),
+
+      // Review Questions
+      sectionHeading("Review Questions"),
+      ...(summary.review_questions ?? []).map((q, i) =>
+        numberedPara(typeof q === "string" ? q : q.question, i),
+      ),
+    ];
+
+    const doc = new Document({
+      styles: {
+        paragraphStyles: [
+          {
+            id: "DocTitle",
+            name: "Doc Title",
+            basedOn: "Normal",
+            run: { size: 48, bold: true, color: "1C1814", font: "Calibri" },
+          },
+          {
+            id: "SubjectTag",
+            name: "Subject Tag",
+            basedOn: "Normal",
+            run: { size: 32, color: "3D72C4", bold: true, font: "Calibri" },
+          },
+          {
+            id: "SectionHeading",
+            name: "Section Heading",
+            basedOn: "Normal",
+            run: { size: 24, bold: true, color: "BB2693", font: "Calibri" },
+          },
+          {
+            id: "CueHeading",
+            name: "Cue Heading",
+            basedOn: "Normal",
+            run: { size: 24, bold: true, color: "1C1814", font: "Calibri" },
+          },
+          {
+            id: "BodyText",
+            name: "Body Text",
+            basedOn: "Normal",
+            run: { size: 22, color: "2E2E2E", font: "Calibri" },
+          },
+        ],
+      },
+      sections: [
+        {
+          properties: {
+            page: {
+              margin: { top: 1080, bottom: 1080, left: 1080, right: 1080 },
+            },
+          },
+          children,
+        },
+      ],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, `${title}.docx`);
   }
 
   function renderContent() {
@@ -121,12 +246,6 @@ export default function ResultsPage() {
     }
   }
 
-  function handleCopy() {
-    navigator.clipboard.writeText(getPlainText());
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -137,40 +256,74 @@ export default function ResultsPage() {
         <Box
           sx={{
             display: "flex",
-            alignItems: "center",
+            alignItems: "flex-start",
             justifyContent: "space-between",
-            gap: 8,
+            gap: 2,
             width: "100%",
           }}
         >
           <Typography variant="h1" className={styles.title}>
             {summary.header?.lecture_title || summary.header?.topic}
           </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={handleDownload}
+            sx={{ flexShrink: 0, display: { xs: "none", sm: "inline-flex" } }}
+          >
+            Download
+          </Button>
         </Box>
 
-        <Chip
-          label={summary.subject}
-          color="info"
-          size="medium"
-          sx={{ mt: 0.5, fontSize: 14, maxWidth: 250, alignSelf: "flex-start" }}
-        />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            mt: 0.5,
+            width: "100%",
+          }}
+        >
+          <Chip
+            label={summary.subject}
+            color="info"
+            size="medium"
+            sx={{ fontSize: 14, maxWidth: 250 }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={handleDownload}
+            sx={{
+              display: { xs: "inline-flex", sm: "none" },
+              minWidth: 0,
+              p: "6px",
+            }}
+          >
+            <DownloadIcon fontSize="small" />
+          </Button>
+        </Box>
       </div>
 
-      <Card className={styles.banner}>
-        <CardContent sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <div>
-            <Typography
-              variant="h5"
-              sx={{ color: theme.palette.secondary.dark }}
-            >
-              Enhanced summary generated ✦
-            </Typography>
-            <Typography variant="body2">
-              Additional course materials used to improve summarisation quality
-            </Typography>
-          </div>
-        </CardContent>
-      </Card>
+      {summary.enhanced && (
+        <Card className={styles.banner}>
+          <CardContent sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <div>
+              <Typography
+                variant="h5"
+                sx={{ color: theme.palette.secondary.dark }}
+              >
+                Enhanced summary generated ✦
+              </Typography>
+              <Typography variant="body2">
+                Additional course materials used to improve summarisation quality
+              </Typography>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Tabs
         value={activeTab}
@@ -195,30 +348,7 @@ export default function ResultsPage() {
       </Tabs>
 
       <Card className={styles.contentCard}>
-        <CardContent>
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
-            {activeTab === "main_points" && (
-              <Tooltip title={copied ? "Copied!" : "Copy section"}>
-                <IconButton
-                  size="small"
-                  onClick={handleCopy}
-                  sx={{
-                    color: copied
-                      ? theme.palette.secondary.main
-                      : theme.palette.text.disabled,
-                  }}
-                >
-                  {copied ? (
-                    <CheckIcon fontSize="small" />
-                  ) : (
-                    <ContentCopyIcon fontSize="small" />
-                  )}
-                </IconButton>
-              </Tooltip>
-            )}
-          </Box>
-          {renderContent()}
-        </CardContent>
+        <CardContent>{renderContent()}</CardContent>
       </Card>
     </div>
   );

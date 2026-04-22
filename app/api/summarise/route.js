@@ -178,6 +178,7 @@ export async function POST(req) {
     ...parsedResult,
     subject,
     topic,
+    enhanced: !!(savedSlide || savedMaterials.length > 0),
     createdAt: new Date(),
     });
 

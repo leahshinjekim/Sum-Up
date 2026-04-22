@@ -11,12 +11,17 @@ import {
   TableCell,
   TableContainer,
   useMediaQuery,
+  IconButton,
+  TextField,
+  Tooltip,
 } from "@mui/material";
+import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/navigation";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import CardSwap, { Card } from "@/components/CardSwap/CardSwap";
-import theme from "@/styles/theme";
 
 export default function Home() {
   const router = useRouter();
@@ -27,6 +32,8 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [editTarget, setEditTarget] = useState(null); // { id, subject, lecture_title }
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -52,6 +59,52 @@ export default function Home() {
 
     fetchHistory();
   }, []);
+
+  function handleEditClick(item) {
+    setEditTarget({
+      id: item._id,
+      subject: item.subject || "",
+      lecture_title: item.header?.lecture_title || "",
+    });
+  }
+
+  function handleEditCancel() {
+    setEditTarget(null);
+  }
+
+  async function handleEditSave() {
+    if (!editTarget) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/history/${editTarget.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: editTarget.subject,
+          lecture_title: editTarget.lecture_title,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSummaryHistory((prev) =>
+          prev.map((item) =>
+            item._id === editTarget.id
+              ? {
+                  ...item,
+                  subject: editTarget.subject,
+                  header: { ...item.header, lecture_title: editTarget.lecture_title },
+                }
+              : item,
+          ),
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update summary:", error);
+    } finally {
+      setSaving(false);
+      setEditTarget(null);
+    }
+  }
 
   function handleView(item) {
     router.push(`/result/${item._id}`);
@@ -268,87 +321,128 @@ export default function Home() {
         </Typography>
       ) : isMd ? (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {summaryHistory.map((item) => (
-            <Box
-              key={item._id}
-              sx={{
-                backgroundColor: "background.paper",
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 3,
-                p: 2.5,
-              }}
-            >
+          {summaryHistory.map((item) => {
+            const isEditing = editTarget?.id === item._id;
+            return (
               <Box
+                key={item._id}
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  mb: 1,
+                  backgroundColor: "background.paper",
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: 3,
+                  p: 2.5,
+                  "& .editBtn": { opacity: 0 },
+                  "&:hover .editBtn": { opacity: 1 },
                 }}
               >
-                <Box>
-                  <Typography variant="h4">
-                    {item.header?.lecture_title || "-"}
-                  </Typography>
-                  {item.subject && (
-                    <Box
-                      sx={{
-                        mt: 1,
-                        display: "inline-block",
-                        backgroundColor: "#fcdaf3",
-                        borderRadius: "999px",
-                        px: 1.5,
-                        py: 0.25,
-                      }}
-                    >
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          fontWeight: 600,
-                          color: theme.palette.primary.main,
-                        }}
-                      >
-                        {item.subject}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    mb: 1,
+                  }}
+                >
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    {isEditing ? (
+                      <TextField
+                        size="small"
+                        fullWidth
+                        value={editTarget.lecture_title}
+                        onChange={(e) => setEditTarget((p) => ({ ...p, lecture_title: e.target.value }))}
+                        autoFocus
+                        sx={{ mb: 1 }}
+                      />
+                    ) : (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        <Typography variant="h4">
+                          {item.header?.lecture_title || "-"}
+                        </Typography>
+                        <Tooltip title="Edit">
+                          <IconButton
+                            className="editBtn"
+                            size="small"
+                            onClick={() => handleEditClick(item)}
+                          >
+                            <DriveFileRenameOutlineOutlinedIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    )}
+                    {isEditing ? (
+                      <TextField
+                        size="small"
+                        fullWidth
+                        value={editTarget.subject}
+                        onChange={(e) => setEditTarget((p) => ({ ...p, subject: e.target.value }))}
+                        sx={{ mb: 1 }}
+                      />
+                    ) : (
+                      item.subject && (
+                        <Box
+                          sx={{
+                            mt: 1,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                            backgroundColor: "#fcdaf3",
+                            borderRadius: "999px",
+                            px: 1.5,
+                            py: 0.25,
+                          }}
+                        >
+                          <Typography
+                            variant="caption"
+                            sx={{ fontWeight: 600, color: theme.palette.primary.main }}
+                          >
+                            {item.subject}
+                          </Typography>
+                        </Box>
+                      )
+                    )}
+                    {!isEditing && (
+                      <Typography variant="body2" sx={{ mt: 1, mb: 1 }}>
+                        {item.header?.topic || "-"}
                       </Typography>
-                    </Box>
-                  )}
-                  <Typography variant="body2" sx={{ mt: 1, mb: 1 }}>
-                    {item.header?.topic || "-"}
+                    )}
+                  </Box>
+                  <Typography
+                    variant="caption"
+                    sx={{ whiteSpace: "nowrap", ml: 1 }}
+                  >
+                    {new Date(item.createdAt).toLocaleDateString("en-GB", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
                   </Typography>
                 </Box>
-                <Typography
-                  variant="caption"
-                  sx={{ whiteSpace: "nowrap", ml: 1 }}
-                >
-                  {new Date(item.createdAt).toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </Typography>
-              </Box>
 
-              <Box sx={{ display: "flex", gap: 1 }}>
-                <Button
-                  variant="contained"
-                  color="info"
-                  size="small"
-                  onClick={() => handleView(item)}
-                >
-                  View
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="small"
-                  onClick={() => handleDeleteClick(item)}
-                >
-                  Delete
-                </Button>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  {isEditing ? (
+                    <>
+                      <Button variant="contained" color="primary" size="small" onClick={handleEditSave} disabled={saving}>
+                        <CheckIcon fontSize="small" />
+                      </Button>
+                      <Button variant="outlined" size="small" onClick={handleEditCancel} disabled={saving}>
+                        <CloseIcon fontSize="small" />
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button variant="contained" color="info" size="small" onClick={() => handleView(item)}>
+                        View
+                      </Button>
+                      <Button variant="contained" color="error" size="small" onClick={() => handleDeleteClick(item)}>
+                        Delete
+                      </Button>
+                    </>
+                  )}
+                </Box>
               </Box>
-            </Box>
-          ))}
+            );
+          })}
         </Box>
       ) : (
         <TableContainer sx={{ overflowX: "auto" }}>
@@ -363,10 +457,50 @@ export default function Home() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {summaryHistory.map((item) => (
-                <TableRow key={item._id}>
-                  <TableCell>{item.subject || "-"}</TableCell>
-                  <TableCell>{item.header?.lecture_title || "-"}</TableCell>
+              {summaryHistory.map((item) => {
+                const isEditing = editTarget?.id === item._id;
+                return (
+                <TableRow
+                  key={item._id}
+                  sx={{
+                    "& .editBtn": { opacity: 0 },
+                    "&:hover .editBtn": { opacity: 1 },
+                  }}
+                >
+                  <TableCell>
+                    {isEditing ? (
+                      <TextField
+                        size="small"
+                        value={editTarget.subject}
+                        onChange={(e) => setEditTarget((p) => ({ ...p, subject: e.target.value }))}
+                        autoFocus
+                      />
+                    ) : (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        {item.subject || "-"}
+                        <Tooltip title="Edit">
+                          <IconButton
+                            className="editBtn"
+                            size="small"
+                            onClick={() => handleEditClick(item)}
+                          >
+                            <DriveFileRenameOutlineOutlinedIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {isEditing ? (
+                      <TextField
+                        size="small"
+                        value={editTarget.lecture_title}
+                        onChange={(e) => setEditTarget((p) => ({ ...p, lecture_title: e.target.value }))}
+                      />
+                    ) : (
+                      item.header?.lecture_title || "-"
+                    )}
+                  </TableCell>
                   <TableCell>{item.header?.topic || "-"}</TableCell>
                   <TableCell sx={{ whiteSpace: "nowrap" }}>
                     {new Date(item.createdAt).toLocaleDateString("en-GB", {
@@ -376,34 +510,46 @@ export default function Home() {
                     })}
                   </TableCell>
                   <TableCell align="right">
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: { md: "column", lg: "row" },
-                        gap: 1,
-                        justifyContent: "flex-end",
-                      }}
-                    >
-                      <Button
-                        variant="contained"
-                        color="info"
-                        size="small"
-                        onClick={() => handleView(item)}
+                    {isEditing ? (
+                      <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+                        <Button variant="contained" color="primary" size="small" onClick={handleEditSave} disabled={saving}>
+                          <CheckIcon fontSize="small" />
+                        </Button>
+                        <Button variant="outlined" size="small" onClick={handleEditCancel} disabled={saving}>
+                          <CloseIcon fontSize="small" />
+                        </Button>
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: { md: "column", lg: "row" },
+                          gap: 1,
+                          justifyContent: "flex-end",
+                        }}
                       >
-                        View
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="error"
-                        size="small"
-                        onClick={() => handleDeleteClick(item)}
-                      >
-                        Delete
-                      </Button>
-                    </Box>
+                        <Button
+                          variant="contained"
+                          color="info"
+                          size="small"
+                          onClick={() => handleView(item)}
+                        >
+                          View
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="error"
+                          size="small"
+                          onClick={() => handleDeleteClick(item)}
+                        >
+                          Delete
+                        </Button>
+                      </Box>
+                    )}
                   </TableCell>
                 </TableRow>
-              ))}
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>

@@ -29,6 +29,7 @@ const ReviewQuestionSchema = new mongoose.Schema(
 const SummarySchema = new mongoose.Schema(
   {
     subject: { type: String },
+    enhanced: { type: Boolean, default: false },
     header: { type: HeaderSchema, required: true },
     main_points: { type: [MainPointSchema], required: true },
     takeaway: { type: String, required: true },
