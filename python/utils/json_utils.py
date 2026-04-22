@@ -241,8 +241,12 @@ def parse_llm_json(llm_output: str):
         _debug_json_error(text, e)
         raise
 
-def save_llm_json(llm_output, output_path):
+def save_llm_json(llm_output, output_path, subject=None):
     data = parse_llm_json(llm_output)
+    
+    if subject is not None:
+        data["subject"] = subject
+
     save_json(data, output_path)
 
 def append_json(new_data, file_path: str):

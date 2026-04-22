@@ -2,6 +2,11 @@ import json
 import re
 from pathlib import Path
 
+def slugify(text: str) -> str:
+    text = text.strip().lower()
+    text = re.sub(r"[^\w\s-]", "", text)
+    text = re.sub(r"[\s-]+", "_", text)
+    return text.strip("_")
 
 def clean_caption_text(text: str) -> str:
     """
@@ -25,12 +30,12 @@ def clean_caption_text(text: str) -> str:
     return text
 
 
-def process_captions_data(captions: list[dict], output_json: str) -> list[dict]:
+def process_captions_data(captions: list[dict], output_root_path: Path, output_json: str) -> list[dict]:
     """
     Process caption list directly and save result to JSON.
     """
 
-    output_path = Path("Outputs") / output_json
+    output_path = output_root_path / output_json
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     processed = []

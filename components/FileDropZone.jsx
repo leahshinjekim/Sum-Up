@@ -4,7 +4,14 @@ import { useTheme } from "@mui/material/styles";
 import styles from "./FileDropZone.module.css";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 
-const FileDropZone = ({ label, accept, files, onFilesChange, variant }) => {
+const FileDropZone = ({
+  label,
+  accept,
+  files = [],
+  onFilesChange,
+  variant,
+  multiple = true,
+}) => {
   const inputRef = useRef(null);
   const theme = useTheme();
 
@@ -15,30 +22,25 @@ const FileDropZone = ({ label, accept, files, onFilesChange, variant }) => {
       ? theme.palette.custom.accent.main
       : theme.palette.primary.main;
 
-  const readAndAppend = (fileList) => {
+  const appendFiles = (fileList) => {
     const newFiles = Array.from(fileList);
     if (!newFiles.length) return;
-    const results = [];
-    let done = 0;
-    newFiles.forEach((file, i) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        results[i] = { name: file.name, content: e.target.result };
-        if (++done === newFiles.length)
-          onFilesChange([...files, ...results]);
-      };
-      reader.readAsText(file);
-    });
+
+    if (multiple) {
+      onFilesChange([...(files || []), ...newFiles]);
+    } else {
+      onFilesChange(newFiles.slice(0, 1));
+    }
   };
 
   const handleChange = (e) => {
-    readAndAppend(e.target.files);
+    appendFiles(e.target.files);
     e.target.value = "";
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    readAndAppend(e.dataTransfer.files);
+    appendFiles(e.dataTransfer.files);
   };
 
   const handleDragOver = (e) => e.preventDefault();
@@ -56,10 +58,11 @@ const FileDropZone = ({ label, accept, files, onFilesChange, variant }) => {
         ref={inputRef}
         type="file"
         accept={accept}
-        multiple
+        multiple={multiple}
         style={{ display: "none" }}
         onChange={handleChange}
       />
+
       {!hasFiles ? (
         <div
           className={styles.dropZone}
@@ -78,18 +81,31 @@ const FileDropZone = ({ label, accept, files, onFilesChange, variant }) => {
         >
           <UploadFileIcon className={styles.icon} />
           <div className={styles.label}>{label}</div>
-          <div className={styles.hint}>Click to browse or drag and drop multiple files</div>
+          <div className={styles.hint}>
+            {multiple
+              ? "Click to browse or drag and drop multiple files"
+              : "Click to browse or drag and drop a file"}
+          </div>
         </div>
       ) : (
         <div
           className={styles.dropZone}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          style={{ borderColor: accentColor, backgroundColor: `${accentColor}08`, cursor: "default", textAlign: "left" }}
+          style={{
+            borderColor: accentColor,
+            backgroundColor: `${accentColor}08`,
+            cursor: "default",
+            textAlign: "left",
+          }}
         >
           <div className={styles.fileList}>
             {files.map((file, i) => (
-              <span key={i} className={styles.fileChip} style={{ color: accentColor, borderColor: `${accentColor}40` }}>
+              <span
+                key={i}
+                className={styles.fileChip}
+                style={{ color: accentColor, borderColor: `${accentColor}40` }}
+              >
                 {file.name}
                 <button
                   className={styles.removeBtn}
@@ -100,13 +116,19 @@ const FileDropZone = ({ label, accept, files, onFilesChange, variant }) => {
                 </button>
               </span>
             ))}
-            <button
-              className={styles.addBtn}
-              onClick={(e) => { e.stopPropagation(); inputRef.current.click(); }}
-              style={{ color: accentColor, borderColor: accentColor }}
-            >
-              + Add another file
-            </button>
+
+            {multiple && (
+              <button
+                className={styles.addBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  inputRef.current.click();
+                }}
+                style={{ color: accentColor, borderColor: accentColor }}
+              >
+                + Add another file
+              </button>
+            )}
           </div>
         </div>
       )}

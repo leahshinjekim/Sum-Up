@@ -29,7 +29,28 @@ const UploadPage = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
+
     try {
+      const formData = new FormData();
+
+      formData.append("subject", subject);
+      formData.append("topic", topic);
+
+      // transcript is required
+      if (transcriptFiles.length > 0) {
+        formData.append("transcript", transcriptFiles[0]);
+      }
+
+      // slide is optional
+      if (slidesFiles.length > 0) {
+        formData.append("slide", slidesFiles[0]);
+      }
+
+      // materials are optional and can be multiple
+      for (const file of materialsFiles) {
+        formData.append("materials", file);
+      }
+
       const res = await fetch("/api/summarise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,11 +62,22 @@ const UploadPage = () => {
           topic,
         }),
       });
+
       const data = await res.json();
-      if (data.success) {
-        // TODO: navigate to results page with summary data
-        console.log("Summary generated:", data.summary);
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to generate summary.");
       }
+
+      console.log("Summary generated:", data.result);
+
+      const summaryId = data.result?._id;
+
+      if (!summaryId) {
+        throw new Error("No summary ID returned from server");
+      }
+
+      router.push(`/result/${summaryId}`);
     } catch (error) {
       console.error("Submit error:", error);
     } finally {
@@ -134,6 +166,7 @@ const UploadPage = () => {
             files={transcriptFiles}
             onFilesChange={setTranscriptFiles}
             variant="primary"
+            multiple={false}
           />
         </CardContent>
       </Card>

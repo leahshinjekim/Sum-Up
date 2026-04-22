@@ -70,8 +70,7 @@ def remove_repeated_header_by_previous_page(
 
     return lines
 
-
-def extract_pdf_pages(pdf_path: str) -> list[dict]:
+def extract_pdf_pages(pdf_path: Path) -> list[dict]:
     """
     Extract page-level text from a PDF and convert it into:
     {
@@ -117,7 +116,7 @@ def save_page_structure_json(data: list[dict], output_filename: str) -> Path:
     Save extracted page structures into the outputs folder.
     """
 
-    output_path = output_filename
+    output_path = Path(output_filename)
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
@@ -130,7 +129,7 @@ def process_pdf_to_page(pdf_path: str, output_filename: str) -> Path:
     Full preprocessing pipeline:
     PDF -> page-level structured JSON
     """
-    page_data = extract_pdf_pages(pdf_path)
+    page_data = extract_pdf_pages(Path(pdf_path))
     output_path = save_page_structure_json(page_data, output_filename)
     return output_path
 
