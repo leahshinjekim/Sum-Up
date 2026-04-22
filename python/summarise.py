@@ -1,6 +1,6 @@
 from pathlib import Path
 import argparse
-import tiktoken
+#import tiktoken
 from utils.pdf_preprocessing import process_pdf_to_page
 from utils.srt_parser import parse_transcript_file
 from utils.text_preprocessing import process_captions_data, slugify
@@ -12,7 +12,7 @@ from openai.types.chat import ChatCompletionMessageParam
 # Change only these two lines when switching models/providers
 PROVIDER = "openai"   # "ollama" or "openai"
 MODEL = "gpt-4o-mini"  # e.g. "qwen2.5:7b" or "gpt-4o-mini"
-tokenizer = tiktoken.get_encoding("o200k_base")
+#tokenizer = tiktoken.get_encoding("o200k_base")
 
 if PROVIDER == "openai":
     from openai import OpenAI
@@ -194,9 +194,9 @@ if __name__ == "__main__":
     
     # 3. Final input length check
     print("\n===== FINAL TOKEN CHECK =====")
-    final_tokens = tokenizer.encode(final_text)
+    #final_tokens = tokenizer.encode(final_text)
     print("Final characters:", len(final_text))
-    print("Final tokens:", len(final_tokens))
+    #print("Final tokens:", len(final_tokens))
 
     # 4. Summarise
     summary = summarize_text(final_text)
