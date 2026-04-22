@@ -7,7 +7,6 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useRouter } from "next/navigation";
 import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 
@@ -15,24 +14,18 @@ const UploadPage = () => {
   const theme = useTheme();
   const router = useRouter();
 
-  const [transcript, setTranscript] = useState("");
   const [transcriptFiles, setTranscriptFiles] = useState([]);
-  const [slides, setSlides] = useState("");
   const [slidesFiles, setSlidesFiles] = useState([]);
-  const [materials, setMaterials] = useState("");
   const [materialsFiles, setMaterialsFiles] = useState([]);
   const [subject, setSubject] = useState("");
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
 
   const canSubmit =
-    (transcript.trim().length > 0 || transcriptFiles.length > 0) &&
+    transcriptFiles.length > 0 &&
     subject.trim().length > 0 &&
     topic.trim().length > 0 &&
     !loading;
-
-  const handleTranscriptFile = (files) => setTranscriptFiles(files);
-  const handleMaterialsFile = (files) => setMaterialsFiles(files);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -41,18 +34,9 @@ const UploadPage = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          transcript:
-            transcriptFiles.length > 0
-              ? transcriptFiles.map((f) => f.content).join("\n\n")
-              : transcript,
-          slides:
-            slidesFiles.length > 0
-              ? slidesFiles.map((f) => f.content).join("\n\n")
-              : slides,
-          materials:
-            materialsFiles.length > 0
-              ? materialsFiles.map((f) => f.content).join("\n\n")
-              : materials,
+          transcript: transcriptFiles.map((f) => f.content).join("\n\n"),
+          slides: slidesFiles.map((f) => f.content).join("\n\n"),
+          materials: materialsFiles.map((f) => f.content).join("\n\n"),
           subject,
           topic,
         }),
@@ -141,7 +125,7 @@ const UploadPage = () => {
             </span>
           </Typography>
           <Typography variant="body2" sx={{ mt: 0.5, mb: 1.5 }}>
-            Upload a file or paste your lecture transcript directly below.
+            Upload your lecture transcript directly below.
           </Typography>
 
           <FileDropZone
@@ -151,175 +135,70 @@ const UploadPage = () => {
             onFilesChange={setTranscriptFiles}
             variant="primary"
           />
-
-          <div className={styles.divider}>
-            <div className={styles.dividerLine} />
-            <span className={styles.dividerText}>or paste directly</span>
-            <div className={styles.dividerLine} />
-          </div>
-
-          <TextField
-            fullWidth
-            multiline
-            rows={7}
-            variant="outlined"
-            value={transcript}
-            onChange={(e) => {
-              setTranscript(e.target.value);
-              if (e.target.value === "") setTranscriptFiles([]);
-              else setTranscriptFiles([]);
-            }}
-            placeholder="Paste your lecture transcript here..."
-          />
-          {transcript && (
-            <Typography
-              variant="caption"
-              sx={{ display: "block", textAlign: "right", mt: 0.5 }}
-            >
-              {transcript.trim().split(/\s+/).length} words
-            </Typography>
-          )}
         </CardContent>
       </Card>
 
-      {/* Slides */}
-      <Card>
-        <CardContent>
-          <Typography variant="h3">
-            Lecture slides
-            <span
-              style={{
-                color: theme.palette.secondary.dark,
-                fontSize: "1rem",
-                fontWeight: 500,
-              }}
-            >
-              {" "}
-              (for enhanced summarisation)
-            </span>
-          </Typography>
-          <Typography variant="body2" sx={{ mt: 0.5, mb: 1.5 }}>
-            Upload your lecture slides for additional context.
-          </Typography>
-
-          <FileDropZone
-            label="Upload lecture slides (.ppt, .pptx, .pdf)"
-            accept=".ppt, .pptx, .pdf"
-            files={slidesFiles}
-            onFilesChange={setSlidesFiles}
-            variant="secondary"
-          />
-
-          <div className={styles.divider}>
-            <div className={styles.dividerLine} />
-            <span className={styles.dividerText}>or paste directly</span>
-            <div className={styles.dividerLine} />
-          </div>
-
-          <TextField
-            fullWidth
-            multiline
-            rows={6}
-            variant="outlined"
-            value={slides}
-            onChange={(e) => {
-              setSlides(e.target.value);
-              if (e.target.value === "") setSlidesFiles([]);
-              else setSlidesFiles([]);
-            }}
-            placeholder="Paste your lecture slides content here..."
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: theme.palette.secondary.main,
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: theme.palette.secondary.main,
-                },
-              },
-            }}
-          />
-          {slides && (
-            <Typography
-              variant="caption"
-              sx={{ display: "block", textAlign: "right", mt: 0.5 }}
-            >
-              {slides.trim().split(/\s+/).length} words
+      <div className={styles.supplementRow}>
+        {/* Slides */}
+        <Card>
+          <CardContent>
+            <Typography variant="h3">
+              Lecture slides
+              <span
+                style={{
+                  color: theme.palette.secondary.dark,
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                }}
+              >
+                {" "}
+                (for enhanced summarisation)
+              </span>
             </Typography>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Other Materials */}
-      <Card>
-        <CardContent>
-          <Typography variant="h3">
-            Other learning materials
-            <span
-              style={{
-                color: theme.palette.custom.accent.dark,
-                fontSize: "1rem",
-                fontWeight: 500,
-              }}
-            >
-              {" "}
-              (for enhanced summarisation)
-            </span>
-          </Typography>
-          <Typography variant="body2" sx={{ mt: 0.5, mb: 1.5 }}>
-            Upload files or paste papers, readings and other learning materials
-            for additional context
-          </Typography>
-
-          <FileDropZone
-            label="Upload course materials (readings, books, etc.)"
-            accept=".txt,.docx,.pdf"
-            files={materialsFiles}
-            onFilesChange={setMaterialsFiles}
-            variant="tertiary"
-          />
-
-          <div className={styles.divider}>
-            <div className={styles.dividerLine} />
-            <span className={styles.dividerText}>or paste directly</span>
-            <div className={styles.dividerLine} />
-          </div>
-
-          <TextField
-            fullWidth
-            multiline
-            rows={6}
-            variant="outlined"
-            value={materials}
-            onChange={(e) => {
-              setMaterials(e.target.value);
-              if (e.target.value === "") setMaterialsFiles([]);
-              else setMaterialsFiles([]);
-            }}
-            placeholder="Paste your lecture slides, readings, or subject outline here..."
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: theme.palette.custom.accent.main,
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: theme.palette.custom.accent.main,
-                },
-              },
-            }}
-          />
-          {materials && (
-            <Typography
-              variant="caption"
-              sx={{ display: "block", textAlign: "right", mt: 0.5 }}
-            >
-              {materials.trim().split(/\s+/).length} words
+            <Typography variant="body2" sx={{ mt: 0.5, mb: 1.5 }}>
+              Upload your lecture slides for additional context.
             </Typography>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* Submit */}
+            <FileDropZone
+              label="Upload lecture slides (.ppt, .pptx, .pdf)"
+              accept=".ppt, .pptx, .pdf"
+              files={slidesFiles}
+              onFilesChange={setSlidesFiles}
+              variant="secondary"
+            />
+          </CardContent>
+        </Card>
+
+        {/* Other Materials */}
+        <Card>
+          <CardContent>
+            <Typography variant="h3">
+              Other learning materials
+              <span
+                style={{
+                  color: theme.palette.custom.accent.dark,
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                }}
+              >
+                {" "}
+                (for enhanced summarisation)
+              </span>
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 0.5, mb: 1.5 }}>
+              Upload additional learning materials for additional context
+            </Typography>
+
+            <FileDropZone
+              label="Upload course materials (readings, books, etc.)"
+              accept=".txt,.docx,.pdf"
+              files={materialsFiles}
+              onFilesChange={setMaterialsFiles}
+              variant="tertiary"
+            />
+          </CardContent>
+        </Card>
+      </div>
       <Button
         fullWidth
         variant="contained"
