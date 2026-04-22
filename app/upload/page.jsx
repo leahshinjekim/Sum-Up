@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useRouter } from "next/navigation";
 import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 
@@ -14,18 +15,24 @@ const UploadPage = () => {
   const theme = useTheme();
   const router = useRouter();
 
+  const [transcript, setTranscript] = useState("");
   const [transcriptFiles, setTranscriptFiles] = useState([]);
+  const [slides, setSlides] = useState("");
   const [slidesFiles, setSlidesFiles] = useState([]);
+  const [materials, setMaterials] = useState("");
   const [materialsFiles, setMaterialsFiles] = useState([]);
   const [subject, setSubject] = useState("");
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
 
   const canSubmit =
-    transcriptFiles.length > 0 &&
+    (transcript.trim().length > 0 || transcriptFiles.length > 0) &&
     subject.trim().length > 0 &&
     topic.trim().length > 0 &&
     !loading;
+
+  const handleTranscriptFile = (files) => setTranscriptFiles(files);
+  const handleMaterialsFile = (files) => setMaterialsFiles(files);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -53,14 +60,7 @@ const UploadPage = () => {
 
       const res = await fetch("/api/summarise", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          transcript: transcriptFiles.map((f) => f.content).join("\n\n"),
-          slides: slidesFiles.map((f) => f.content).join("\n\n"),
-          materials: materialsFiles.map((f) => f.content).join("\n\n"),
-          subject,
-          topic,
-        }),
+        body: formData,
       });
 
       const data = await res.json();

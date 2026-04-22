@@ -38,9 +38,9 @@ async function removeDirectorySafe(dirPath) {
 function runPythonScript(args, workingDir) {
   return new Promise((resolve, reject) => {
     const pythonCommand =
-        process.platform === "win32"
-            ? path.join(process.cwd(), "python", ".venv", "Scripts", "python.exe")
-            : path.join(process.cwd(), "python", ".venv", "bin", "python");
+      process.platform === "win32"
+        ? path.join(process.cwd(), "python", ".venv", "Scripts", "python.exe")
+        : path.join(process.cwd(), "python", ".venv", "bin", "python");
     const child = spawn(pythonCommand, args, {
       cwd: workingDir,
       stdio: ["ignore", "pipe", "pipe"],
@@ -63,7 +63,9 @@ function runPythonScript(args, workingDir) {
         resolve();
       } else {
         reject(
-          new Error(`Python process failed with code ${code}\n${stderr || stdout}`)
+          new Error(
+            `Python process failed with code ${code}\n${stderr || stdout}`,
+          ),
         );
       }
     });
@@ -92,29 +94,29 @@ export async function POST(req) {
     if (!subject) {
       return NextResponse.json(
         { success: false, error: "Subject is required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!topic) {
       return NextResponse.json(
         { success: false, error: "Topic is required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!transcript || transcript.size === 0) {
       return NextResponse.json(
         { success: false, error: "Transcript file is required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const savedTranscript = await saveUploadedFile(transcript, uploadDir);
-    
+
     let savedSlide = null;
     if (slide && slide.size > 0) {
-        savedSlide = await saveUploadedFile(slide, uploadDir);
+      savedSlide = await saveUploadedFile(slide, uploadDir);
     }
 
     const savedMaterials = [];
@@ -124,9 +126,9 @@ export async function POST(req) {
         savedMaterials.push(saved);
       }
     }
-    
+
     function slugify(value) {
-    return value
+      return value
         .toLowerCase()
         .trim()
         .replace(/[^\w\s-]/g, "")
@@ -135,65 +137,66 @@ export async function POST(req) {
     const subjectSlug = slugify(subject);
     const topicSlug = slugify(topic);
     const outputFileName = `${subjectSlug}_${topicSlug}.json`;
-    
+
     const pythonScriptPath = path.join(process.cwd(), "python", "summarise.py");
 
     const pythonArgs = [
-        pythonScriptPath,
-        savedTranscript.savedPath,  // input path(=uploaded transcript)
-        outputFileName,   // output file name only, script will save to outputDir
+      pythonScriptPath,
+      savedTranscript.savedPath, // input path(=uploaded transcript)
+      outputFileName, // output file name only, script will save to outputDir
 
-        "--subject",
-        subject,
+      "--subject",
+      subject,
 
-        "--topic",
-        topic,
+      "--topic",
+      topic,
     ];
 
     if (savedSlide) {
-        pythonArgs.push("--slide", savedSlide.savedPath);
+      pythonArgs.push("--slide", savedSlide.savedPath);
     }
 
     if (savedMaterials.length > 0) {
-        pythonArgs.push("--materials", ...savedMaterials.map((f) => f.savedPath));
+      pythonArgs.push("--materials", ...savedMaterials.map((f) => f.savedPath));
     }
 
     await runPythonScript(pythonArgs, process.cwd());
     // Result Folder: outputs/{subject}_{topic}/results/
     const resultJsonPath = path.join(
-        process.cwd(),
-        "outputs",
-        `${subjectSlug}_${topicSlug}`,
-        "results",
-        outputFileName
+      process.cwd(),
+      "outputs",
+      `${subjectSlug}_${topicSlug}`,
+      "results",
+      outputFileName,
     );
 
     const rawResult = await fs.readFile(resultJsonPath, "utf-8");
     const parsedResult = JSON.parse(rawResult);
+    parsedResult.header.lecture_title = topic;
 
     // ✅ MongoDB Save
     await connectDB();
 
     const savedSummary = await Summary.create({
-    ...parsedResult,
-    subject,
-    topic,
-    enhanced: !!(savedSlide || savedMaterials.length > 0),
-    createdAt: new Date(),
+      ...parsedResult,
+      subject,
+      topic,
+      enhanced: !!(savedSlide || savedMaterials.length > 0),
+      createdAt: new Date(),
     });
 
     // outputs/{subject}_{topic} folder cleanup after saving to DB
     const outputDir = path.join(
       process.cwd(),
       "outputs",
-      `${subjectSlug}_${topicSlug}`
+      `${subjectSlug}_${topicSlug}`,
     );
 
     await removeDirectorySafe(outputDir);
 
     return NextResponse.json({
-    success: true,
-    result: savedSummary,
+      success: true,
+      result: savedSummary,
     });
   } catch (error) {
     console.error("Summarise route error:", error);
@@ -203,7 +206,7 @@ export async function POST(req) {
         success: false,
         error: error.message || "Failed to generate summary.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   } finally {
     await removeDirectorySafe(uploadDir);
