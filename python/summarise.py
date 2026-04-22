@@ -138,7 +138,7 @@ if __name__ == "__main__":
 
     print("Transcript file:", transcript_path)
     print("Transcript characters:", len(transcript_text))
-    print("Transcript tokens:", len(tokenizer.encode(transcript_text)))
+    #print("Transcript tokens:", len(tokenizer.encode(transcript_text)))
 
     sources.append(("Lecture Transcript", transcript_text))
 
