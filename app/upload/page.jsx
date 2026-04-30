@@ -10,6 +10,7 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const UploadPage = () => {
   const theme = useTheme();
@@ -87,6 +88,7 @@ const UploadPage = () => {
 
   return (
     <div className={styles.page}>
+      {loading && <LoadingScreen />}
       {/* Header */}
       <div className={styles.header}>
         <button className={styles.backBtn} onClick={() => router.push("/")}>
@@ -108,7 +110,7 @@ const UploadPage = () => {
           <div className={styles.contextGrid}>
             <div>
               <Typography variant="overline" component="label">
-                Subject / Course{" "}
+                Subject Name{" "}
                 <span style={{ color: theme.palette.primary.main }}>*</span>
               </Typography>
               <TextField
@@ -117,13 +119,13 @@ const UploadPage = () => {
                 size="small"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="e.g. 32516 Internet Programming"
+                placeholder="e.g. Internet Programming"
                 sx={{ mt: 0.5 }}
               />
             </div>
             <div>
               <Typography variant="overline" component="label">
-                Lecture Topic{" "}
+                Lecture Title{" "}
                 <span style={{ color: theme.palette.primary.main }}>*</span>
               </Typography>
               <TextField

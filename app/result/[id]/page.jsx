@@ -289,7 +289,7 @@ export default function ResultsPage() {
             label={summary.subject}
             color="info"
             size="medium"
-            sx={{ fontSize: 14, maxWidth: 250 }}
+            sx={{ fontSize: 14 }}
           />
           <Button
             variant="contained"

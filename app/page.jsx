@@ -10,16 +10,23 @@ import {
   TableRow,
   TableCell,
   TableContainer,
+  TablePagination,
   useMediaQuery,
   IconButton,
   TextField,
   Tooltip,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  InputAdornment,
 } from "@mui/material";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/navigation";
+import SearchIcon from "@mui/icons-material/Search";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import CardSwap, { Card } from "@/components/CardSwap/CardSwap";
 
@@ -34,6 +41,10 @@ export default function Home() {
   const [deleting, setDeleting] = useState(false);
   const [editTarget, setEditTarget] = useState(null); // { id, subject, lecture_title }
   const [saving, setSaving] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filterSubject, setFilterSubject] = useState("");
+  const [page, setPage] = useState(0);
+  const ROWS_PER_PAGE = 5;
 
   useEffect(() => {
     setMounted(true);
@@ -138,6 +149,21 @@ export default function Home() {
       setDeleteTarget(null);
     }
   }
+
+  const uniqueSubjects = [...new Set(summaryHistory.map((i) => i.subject).filter(Boolean))];
+
+  const filtered = summaryHistory.filter((item) => {
+    const q = search.toLowerCase();
+    const matchSearch =
+      !q ||
+      item.subject?.toLowerCase().includes(q) ||
+      item.header?.lecture_title?.toLowerCase().includes(q) ||
+      item.header?.topic?.toLowerCase().includes(q);
+    const matchSubject = !filterSubject || item.subject === filterSubject;
+    return matchSearch && matchSubject;
+  });
+
+  const paginated = filtered.slice(page * ROWS_PER_PAGE, (page + 1) * ROWS_PER_PAGE);
 
   const featureCards = [
     {
@@ -309,6 +335,35 @@ export default function Home() {
         <Typography variant="h2" gutterBottom>
           Summary History
         </Typography>
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mt: 1 }}>
+          <TextField
+            size="small"
+            placeholder="Search by subject, title or topic…"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+            sx={{ flex: 1, minWidth: 220 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel>Subject</InputLabel>
+            <Select
+              value={filterSubject}
+              label="Subject"
+              onChange={(e) => { setFilterSubject(e.target.value); setPage(0); }}
+            >
+              <MenuItem value="">All subjects</MenuItem>
+              {uniqueSubjects.map((s) => (
+                <MenuItem key={s} value={s}>{s}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
 
       {loading ? (
@@ -319,9 +374,13 @@ export default function Home() {
         <Typography variant="body2" sx={{ p: 6, textAlign: "center" }}>
           No summaries yet. Start generating your first summary!
         </Typography>
+      ) : filtered.length === 0 ? (
+        <Typography variant="body2" sx={{ p: 6, textAlign: "center" }}>
+          No summaries match your search.
+        </Typography>
       ) : isMd ? (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {summaryHistory.map((item) => {
+          {paginated.map((item) => {
             const isEditing = editTarget?.id === item._id;
             return (
               <Box
@@ -457,7 +516,7 @@ export default function Home() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {summaryHistory.map((item) => {
+              {paginated.map((item) => {
                 const isEditing = editTarget?.id === item._id;
                 return (
                 <TableRow
@@ -553,6 +612,17 @@ export default function Home() {
             </TableBody>
           </Table>
         </TableContainer>
+      )}
+
+      {!loading && filtered.length > 0 && (
+        <TablePagination
+          component="div"
+          count={filtered.length}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+          rowsPerPage={ROWS_PER_PAGE}
+          rowsPerPageOptions={[ROWS_PER_PAGE]}
+        />
       )}
 
       <ConfirmDialog
