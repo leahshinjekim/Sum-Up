@@ -224,7 +224,7 @@ MAIN POINT CONSTRUCTION
 
 - Include 6–12 main points
 - Each MUST include:
-  - cue
+  - cue question
   - summary
   - example
   - evidence
