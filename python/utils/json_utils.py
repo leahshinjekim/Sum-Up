@@ -241,9 +241,48 @@ def parse_llm_json(llm_output: str):
         _debug_json_error(text, e)
         raise
 
+def normalize_summary_json(data):
+    """
+    Normalize LLM summary JSON fields to match the backend/Mongoose schema.
+    This prevents minor LLM output format changes from breaking validation.
+    """
+
+    # Normalize review_questions to [{ "question": "..." }]
+    review_questions = data.get("review_questions", [])
+
+    if isinstance(review_questions, list):
+        normalized_questions = []
+
+        for q in review_questions:
+            if isinstance(q, str):
+                normalized_questions.append({
+                    "question": q
+                })
+
+            elif isinstance(q, dict):
+                question_text = q.get("question", "")
+
+                if question_text:
+                    normalized_questions.append({
+                        "question": question_text
+                    })
+
+            else:
+                normalized_questions.append({
+                    "question": str(q)
+                })
+
+        data["review_questions"] = normalized_questions
+
+    else:
+        data["review_questions"] = []
+
+    return data
+
 def save_llm_json(llm_output, output_path, subject=None):
-    data = parse_llm_json(llm_output)
     
+    data = parse_llm_json(llm_output)
+    data = normalize_summary_json(data)
     if subject is not None:
         data["subject"] = subject
 
