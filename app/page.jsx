@@ -27,6 +27,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/navigation";
 import SearchIcon from "@mui/icons-material/Search";
+import Image from "next/image";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import CardSwap, { Card } from "@/components/CardSwap/CardSwap";
 
@@ -244,13 +245,12 @@ export default function Home() {
             minHeight: "100vh",
           }}
         >
-          <img
+          <Image
             src="/logo.png"
             alt="Sum-Up"
-            style={{
-              width: "min(500px, 100%)",
-              height: "auto",
-            }}
+            width={500}
+            height={200}
+            style={{ width: "min(500px, 100%)", height: "auto" }}
           />
           <Typography
             variant="hero"
