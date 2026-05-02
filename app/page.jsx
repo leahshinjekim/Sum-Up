@@ -339,7 +339,7 @@ export default function Home() {
         </Box>
       </Box>
 
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 2, mt: { xs: 6, md: 10 } }}>
         <Typography variant="h2" gutterBottom>
           Summary History
         </Typography>
