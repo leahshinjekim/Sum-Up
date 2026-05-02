@@ -29,7 +29,7 @@ const theme = createTheme({
       contrastText: "#ffffff",
     },
     background: {
-      default: "#fafafa",
+      default: "#ffffff",
       paper: "#faf8f4",
     },
     text: {
@@ -47,13 +47,8 @@ const theme = createTheme({
         dark: "#1a5ca8",
         contrastText: "#ffffff",
       },
-      sand: "#e8e8e8",
-      sandDark: "#e0d0dc",
       muted: "#7a7a7a",
       mutedLight: "#b8afa8",
-      highlightBg: "#fdf6dc",
-      blueBg: "#ebf2ff",
-      blue: "#3d72c4",
     },
   },
 
@@ -161,18 +156,6 @@ const theme = createTheme({
 
   // ── COMPONENT OVERRIDES ───────────────────────────────────────────────────
   components: {
-    // ── App Bar / Navbar
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          backgroundColor: "#fafafa",
-          borderBottom: "1px solid #e8e8e8",
-          boxShadow: "0 1px 12px rgba(28,24,20,0.07)",
-          color: "#1c1814",
-        },
-      },
-    },
-
     // ── Button
     MuiButton: {
       styleOverrides: {
@@ -306,7 +289,7 @@ const theme = createTheme({
     MuiTableContainer: {
       styleOverrides: {
         root: {
-          backgroundColor: "#fafafa",
+          backgroundColor: "#ffffff",
           border: "1px solid #e8e8e8",
           borderRadius: 14,
           boxShadow: "none",

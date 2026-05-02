@@ -120,7 +120,7 @@ const UploadPage = () => {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="e.g. Internet Programming"
-                sx={{ mt: 0.5 }}
+                sx={{ mt: 0.5, "& .MuiOutlinedInput-root": { backgroundColor: "#ffffff" } }}
               />
             </div>
             <div>
@@ -135,7 +135,7 @@ const UploadPage = () => {
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="e.g. Introduction to Web Development"
-                sx={{ mt: 0.5 }}
+                sx={{ mt: 0.5, "& .MuiOutlinedInput-root": { backgroundColor: "#ffffff" } }}
               />
             </div>
           </div>

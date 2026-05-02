@@ -103,7 +103,10 @@ export default function Home() {
               ? {
                   ...item,
                   subject: editTarget.subject,
-                  header: { ...item.header, lecture_title: editTarget.lecture_title },
+                  header: {
+                    ...item.header,
+                    lecture_title: editTarget.lecture_title,
+                  },
                 }
               : item,
           ),
@@ -150,7 +153,9 @@ export default function Home() {
     }
   }
 
-  const uniqueSubjects = [...new Set(summaryHistory.map((i) => i.subject).filter(Boolean))];
+  const uniqueSubjects = [
+    ...new Set(summaryHistory.map((i) => i.subject).filter(Boolean)),
+  ];
 
   const filtered = summaryHistory.filter((item) => {
     const q = search.toLowerCase();
@@ -163,7 +168,10 @@ export default function Home() {
     return matchSearch && matchSubject;
   });
 
-  const paginated = filtered.slice(page * ROWS_PER_PAGE, (page + 1) * ROWS_PER_PAGE);
+  const paginated = filtered.slice(
+    page * ROWS_PER_PAGE,
+    (page + 1) * ROWS_PER_PAGE,
+  );
 
   const featureCards = [
     {
@@ -186,7 +194,7 @@ export default function Home() {
   ];
 
   const cardStyle = {
-    background: "#fafafa",
+    background: "#ffffff",
     padding: 32,
     display: "flex",
     flexDirection: "column",
@@ -340,8 +348,11 @@ export default function Home() {
             size="small"
             placeholder="Search by subject, title or topic…"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-            sx={{ flex: 1, minWidth: 220 }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(0);
+            }}
+            sx={{ flex: 1, minWidth: 220, "& .MuiOutlinedInput-root": { backgroundColor: "#ffffff" } }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -350,16 +361,22 @@ export default function Home() {
               ),
             }}
           />
-          <FormControl size="small" sx={{ minWidth: 180 }}>
-            <InputLabel>Subject</InputLabel>
+          <FormControl size="small" sx={{ minWidth: 180, "& .MuiOutlinedInput-root": { backgroundColor: "#ffffff" } }}>
+            <InputLabel sx={{ textTransform: "none", fontSize: "0.92rem", fontWeight: 400, letterSpacing: 0, color: "#a8a8a8", "&.Mui-focused": { color: "#bb2693" } }}>Subject</InputLabel>
             <Select
               value={filterSubject}
               label="Subject"
-              onChange={(e) => { setFilterSubject(e.target.value); setPage(0); }}
+              onChange={(e) => {
+                setFilterSubject(e.target.value);
+                setPage(0);
+              }}
+              MenuProps={{ PaperProps: { sx: { backgroundColor: "#ffffff" } } }}
             >
               <MenuItem value="">All subjects</MenuItem>
               {uniqueSubjects.map((s) => (
-                <MenuItem key={s} value={s}>{s}</MenuItem>
+                <MenuItem key={s} value={s}>
+                  {s}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -409,12 +426,19 @@ export default function Home() {
                         size="small"
                         fullWidth
                         value={editTarget.lecture_title}
-                        onChange={(e) => setEditTarget((p) => ({ ...p, lecture_title: e.target.value }))}
+                        onChange={(e) =>
+                          setEditTarget((p) => ({
+                            ...p,
+                            lecture_title: e.target.value,
+                          }))
+                        }
                         autoFocus
                         sx={{ mb: 1 }}
                       />
                     ) : (
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                      >
                         <Typography variant="h4">
                           {item.header?.lecture_title || "-"}
                         </Typography>
@@ -434,7 +458,12 @@ export default function Home() {
                         size="small"
                         fullWidth
                         value={editTarget.subject}
-                        onChange={(e) => setEditTarget((p) => ({ ...p, subject: e.target.value }))}
+                        onChange={(e) =>
+                          setEditTarget((p) => ({
+                            ...p,
+                            subject: e.target.value,
+                          }))
+                        }
                         sx={{ mb: 1 }}
                       />
                     ) : (
@@ -453,7 +482,10 @@ export default function Home() {
                         >
                           <Typography
                             variant="caption"
-                            sx={{ fontWeight: 600, color: theme.palette.primary.main }}
+                            sx={{
+                              fontWeight: 600,
+                              color: theme.palette.primary.main,
+                            }}
                           >
                             {item.subject}
                           </Typography>
@@ -481,19 +513,40 @@ export default function Home() {
                 <Box sx={{ display: "flex", gap: 1 }}>
                   {isEditing ? (
                     <>
-                      <Button variant="contained" color="primary" size="small" onClick={handleEditSave} disabled={saving}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        onClick={handleEditSave}
+                        disabled={saving}
+                      >
                         <CheckIcon fontSize="small" />
                       </Button>
-                      <Button variant="outlined" size="small" onClick={handleEditCancel} disabled={saving}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={handleEditCancel}
+                        disabled={saving}
+                      >
                         <CloseIcon fontSize="small" />
                       </Button>
                     </>
                   ) : (
                     <>
-                      <Button variant="contained" color="info" size="small" onClick={() => handleView(item)}>
+                      <Button
+                        variant="contained"
+                        color="info"
+                        size="small"
+                        onClick={() => handleView(item)}
+                      >
                         View
                       </Button>
-                      <Button variant="contained" color="error" size="small" onClick={() => handleDeleteClick(item)}>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        size="small"
+                        onClick={() => handleDeleteClick(item)}
+                      >
                         Delete
                       </Button>
                     </>
@@ -519,94 +572,127 @@ export default function Home() {
               {paginated.map((item) => {
                 const isEditing = editTarget?.id === item._id;
                 return (
-                <TableRow
-                  key={item._id}
-                  sx={{
-                    "& .editBtn": { opacity: 0 },
-                    "&:hover .editBtn": { opacity: 1 },
-                  }}
-                >
-                  <TableCell>
-                    {isEditing ? (
-                      <TextField
-                        size="small"
-                        value={editTarget.subject}
-                        onChange={(e) => setEditTarget((p) => ({ ...p, subject: e.target.value }))}
-                        autoFocus
-                      />
-                    ) : (
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                        {item.subject || "-"}
-                        <Tooltip title="Edit">
-                          <IconButton
-                            className="editBtn"
+                  <TableRow
+                    key={item._id}
+                    sx={{
+                      "& .editBtn": { opacity: 0 },
+                      "&:hover .editBtn": { opacity: 1 },
+                    }}
+                  >
+                    <TableCell>
+                      {isEditing ? (
+                        <TextField
+                          size="small"
+                          value={editTarget.subject}
+                          onChange={(e) =>
+                            setEditTarget((p) => ({
+                              ...p,
+                              subject: e.target.value,
+                            }))
+                          }
+                          autoFocus
+                        />
+                      ) : (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                          }}
+                        >
+                          {item.subject || "-"}
+                          <Tooltip title="Edit">
+                            <IconButton
+                              className="editBtn"
+                              size="small"
+                              onClick={() => handleEditClick(item)}
+                            >
+                              <DriveFileRenameOutlineOutlinedIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {isEditing ? (
+                        <TextField
+                          size="small"
+                          value={editTarget.lecture_title}
+                          onChange={(e) =>
+                            setEditTarget((p) => ({
+                              ...p,
+                              lecture_title: e.target.value,
+                            }))
+                          }
+                        />
+                      ) : (
+                        item.header?.lecture_title || "-"
+                      )}
+                    </TableCell>
+                    <TableCell>{item.header?.topic || "-"}</TableCell>
+                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                      {new Date(item.createdAt).toLocaleDateString("en-GB", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </TableCell>
+                    <TableCell align="right">
+                      {isEditing ? (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            gap: 1,
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          <Button
+                            variant="contained"
+                            color="primary"
                             size="small"
-                            onClick={() => handleEditClick(item)}
+                            onClick={handleEditSave}
+                            disabled={saving}
                           >
-                            <DriveFileRenameOutlineOutlinedIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {isEditing ? (
-                      <TextField
-                        size="small"
-                        value={editTarget.lecture_title}
-                        onChange={(e) => setEditTarget((p) => ({ ...p, lecture_title: e.target.value }))}
-                      />
-                    ) : (
-                      item.header?.lecture_title || "-"
-                    )}
-                  </TableCell>
-                  <TableCell>{item.header?.topic || "-"}</TableCell>
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {new Date(item.createdAt).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </TableCell>
-                  <TableCell align="right">
-                    {isEditing ? (
-                      <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-                        <Button variant="contained" color="primary" size="small" onClick={handleEditSave} disabled={saving}>
-                          <CheckIcon fontSize="small" />
-                        </Button>
-                        <Button variant="outlined" size="small" onClick={handleEditCancel} disabled={saving}>
-                          <CloseIcon fontSize="small" />
-                        </Button>
-                      </Box>
-                    ) : (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: { md: "column", lg: "row" },
-                          gap: 1,
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        <Button
-                          variant="contained"
-                          color="info"
-                          size="small"
-                          onClick={() => handleView(item)}
+                            <CheckIcon fontSize="small" />
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={handleEditCancel}
+                            disabled={saving}
+                          >
+                            <CloseIcon fontSize="small" />
+                          </Button>
+                        </Box>
+                      ) : (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: { md: "column", lg: "row" },
+                            gap: 1,
+                            justifyContent: "flex-end",
+                          }}
                         >
-                          View
-                        </Button>
-                        <Button
-                          variant="contained"
-                          color="error"
-                          size="small"
-                          onClick={() => handleDeleteClick(item)}
-                        >
-                          Delete
-                        </Button>
-                      </Box>
-                    )}
-                  </TableCell>
-                </TableRow>
+                          <Button
+                            variant="contained"
+                            color="info"
+                            size="small"
+                            onClick={() => handleView(item)}
+                          >
+                            View
+                          </Button>
+                          <Button
+                            variant="contained"
+                            color="error"
+                            size="small"
+                            onClick={() => handleDeleteClick(item)}
+                          >
+                            Delete
+                          </Button>
+                        </Box>
+                      )}
+                    </TableCell>
+                  </TableRow>
                 );
               })}
             </TableBody>

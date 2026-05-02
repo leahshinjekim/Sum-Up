@@ -45,7 +45,7 @@ export default function LoadingScreen() {
         width: "100vw",
         height: "100vh",
         zIndex: 9999,
-        backgroundColor: "#fafafa",
+        backgroundColor: "#ffffff",
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
