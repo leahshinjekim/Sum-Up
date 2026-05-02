@@ -185,11 +185,11 @@ export async function POST(req) {
       createdAt: new Date(),
     });
 
-    // outputs/{subject}_{topic} folder cleanup after saving to DB
+    // Delete the output directory for this job to clean up generated files
+    // Note outputs/{subject}_{topic} folder cleanup after saving to DB : add `${subjectSlug}_${topicSlug}`, after "outputs",  
     const outputDir = path.join(
       process.cwd(),
       "outputs",
-      `${subjectSlug}_${topicSlug}`,
     );
 
     await removeDirectorySafe(outputDir);

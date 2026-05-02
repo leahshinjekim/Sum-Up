@@ -5,7 +5,6 @@ from utils.pdf_preprocessing import process_pdf_to_page
 from utils.srt_parser import parse_transcript_file
 from utils.text_preprocessing import process_captions_data, slugify
 from utils.json_utils import load_json, save_llm_json
-from utils.prettyTxt import convert_json_to_txt
 from prompts import SUMMARISE_PROMPT
 from openai.types.chat import ChatCompletionMessageParam
 
