@@ -164,7 +164,7 @@ npm run dev
 
 This project uses a Python-based pipeline for AI-powered lecture summarisation.
 
-### 🔹 1. Install Python
+### 🔹 Install Python & the required libraries through Terminal / PowerShell
 
 Ensure you have Python installed:
 
