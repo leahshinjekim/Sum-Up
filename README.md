@@ -174,4 +174,6 @@ Verify installation:
 
 ```bash
 python --version
+pip install pymupdf openai ollama
+```
 
