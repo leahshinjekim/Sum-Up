@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+🚀 Sum-Up — Context-Aware Lecture Summarisation
 
-## Getting Started
+A full-stack AI-powered web application that generates structured, context-aware lecture summaries by combining transcripts with optional course materials.
 
-First, run the development server:
+✨ Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Sum-Up is a modern educational tool designed to improve how university students review lectures. Unlike traditional summarisation tools that rely solely on transcripts, this system incorporates lecture slides and supplementary materials as contextual input to produce more accurate and structured summaries.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The output follows a Cornell-inspired format, transforming raw lecture content into a learning-oriented structure that supports efficient revision and active recall.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+🧠 Key Idea
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Most AI summarisation tools compress text.
+Sum-Up restructures knowledge for learning.
 
-## Learn More
+Instead of generating a paragraph summary, Sum-Up produces:
 
-To learn more about Next.js, take a look at the following resources:
+🎯 Learning Goals
+📌 Structured Main Points
+💡 Key Takeaways
+❓ Review Questions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This improves readability, comprehension, and long-term retention.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+⚙️ Tech Stack
+Frontend: Next.js + Material UI
+Backend: Next.js API Routes (Node.js)
+AI Pipeline: Python (LLM-based summarisation)
+Database: MongoDB (document-based storage)
+Deployment: Vercel
 
-## Deploy on Vercel
+🚀 Features
+🧾 Context-Aware Summarisation
+Uses transcript as primary source
+Enhances output with slides & supplementary materials
+Prevents hallucination via strict source control
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+🧩 Structured Learning Output
+Cornell-inspired format for better study experience
+Improves:
+Readability
+Information hierarchy
+Active recall
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+🔄 Full Learning Workflow (CRUD)
+Create summaries
+View & search history
+Delete entries
+Download summaries for offline use
+
+⚡ Smart Input System
+Required: Transcript
+Optional: Slides & materials
+Flexible usage:
+Quick summaries (transcript only)
+High-quality summaries (context-enhanced)
+
+📊 Dashboard & History Management
+Summary table with metadata (subject, topic, date)
+Search & filter functionality
+Persistent storage via MongoDB
+
+⏳ Real-Time Feedback
+Loading state during AI processing
+Clear UI guidance to prevent invalid input
