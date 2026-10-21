@@ -90,7 +90,7 @@ export default function UploadForm() {
 
       <FileDropZone
         label="Upload Transcript"
-        accept=".srt,.txt"
+        accept=".srt,.vtt,.txt,.pdf"
         files={transcriptFiles}
         onFilesChange={setTranscriptFiles}
         multiple={false}
@@ -98,7 +98,7 @@ export default function UploadForm() {
 
       <FileDropZone
         label="Upload Slide"
-        accept=".pdf"
+        accept=".srt,.vtt,.txt,.pdf"
         files={slideFiles}
         onFilesChange={setSlideFiles}
         variant="secondary"
@@ -107,7 +107,7 @@ export default function UploadForm() {
 
       <FileDropZone
         label="Upload Supporting Materials"
-        accept=".pdf,.txt,.json"
+        accept=".srt,.vtt,.txt,.pdf"
         files={materialFiles}
         onFilesChange={setMaterialFiles}
         variant="tertiary"

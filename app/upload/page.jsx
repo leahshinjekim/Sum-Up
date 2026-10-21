@@ -10,6 +10,7 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import Alert from "@mui/material/Alert";
 import LoadingScreen from "@/components/LoadingScreen";
 
 const UploadPage = () => {
@@ -25,6 +26,7 @@ const UploadPage = () => {
   const [subject, setSubject] = useState("");
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const canSubmit =
     (transcript.trim().length > 0 || transcriptFiles.length > 0) &&
@@ -37,6 +39,7 @@ const UploadPage = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
+    setError("");
 
     try {
       const formData = new FormData();
@@ -81,6 +84,7 @@ const UploadPage = () => {
       router.push(`/result/${summaryId}`);
     } catch (error) {
       console.error("Submit error:", error);
+      setError(error.message || "Failed to generate summary.");
     } finally {
       setLoading(false);
     }
@@ -163,8 +167,8 @@ const UploadPage = () => {
           </Typography>
 
           <FileDropZone
-            label="Upload transcript file (.txt, .pdf, .srt)"
-            accept=".txt,.pdf,.srt"
+            label="Upload transcript file (.txt, .srt, .vtt, .pdf)"
+            accept=".txt,.srt,.vtt,.pdf"
             files={transcriptFiles}
             onFilesChange={setTranscriptFiles}
             variant="primary"
@@ -195,8 +199,8 @@ const UploadPage = () => {
             </Typography>
 
             <FileDropZone
-              label="Upload lecture slides (.ppt, .pptx, .pdf)"
-              accept=".ppt, .pptx, .pdf"
+              label="Upload lecture slides (.txt, .srt, .vtt, .pdf)"
+              accept=".txt,.srt,.vtt,.pdf"
               files={slidesFiles}
               onFilesChange={setSlidesFiles}
               variant="secondary"
@@ -225,8 +229,8 @@ const UploadPage = () => {
             </Typography>
 
             <FileDropZone
-              label="Upload course materials (readings, books, etc.)"
-              accept=".txt,.docx,.pdf"
+              label="Upload course materials (.txt, .srt, .vtt, .pdf)"
+              accept=".txt,.srt,.vtt,.pdf"
               files={materialsFiles}
               onFilesChange={setMaterialsFiles}
               variant="tertiary"
@@ -234,6 +238,11 @@ const UploadPage = () => {
           </CardContent>
         </Card>
       </div>
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
       <Button
         fullWidth
         variant="contained"
