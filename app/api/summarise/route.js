@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { PDFParse } from "pdf-parse";
+import { auth } from "@clerk/nextjs/server";
 
 import { connectDB } from "@/lib/mongodb";
 import { SUMMARISE_PROMPT } from "@/lib/summarisePrompt";
@@ -161,6 +162,11 @@ async function generateSummary({ topic, transcript, slide, materials }) {
 
 export async function POST(req) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return Response.json({ success: false, error: "Authentication is required." }, { status: 401 });
+    }
+
     const formData = await req.formData();
     const subject = String(formData.get("subject") || "").trim();
     const topic = String(formData.get("topic") || "").trim();

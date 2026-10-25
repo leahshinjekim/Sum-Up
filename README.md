@@ -160,6 +160,25 @@ npm run dev
 ```
 ---
 
+## Authentication and environment configuration
+
+Sum-Up uses Clerk for email sign-up/sign-in and verification. Google sign-in is shown automatically by Clerk after the Google social connection is enabled in the Clerk Dashboard for the development instance.
+
+Copy `.env.example` to `.env.local` and set the following server-side values locally and in the deployment environment:
+
+- `MONGODB_URI`
+- `OPENAI_API_KEY`
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY`
+
+Never commit `.env.local` or real service keys. Development keys stay local in `.env.local`; the Clerk development instance itself is hosted by Clerk and should not be claimed or deployed yet.
+
+### Development access restriction
+
+Do not deploy or enable public production access yet. Although authentication is now required for the application routes and APIs, summaries are not associated with an owner and AI usage is not limited. Complete ownership enforcement and usage limits before creating a public production deployment.
+
+---
+
 ## 🧠 AI Setup (Python + LLM)
 
 This project uses a Python-based pipeline for AI-powered lecture summarisation.

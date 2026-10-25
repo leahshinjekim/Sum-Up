@@ -8,6 +8,7 @@ import "@fontsource/dm-sans/600.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import AuthControls from "@/components/AuthControls";
 import theme from "@/styles/theme";
 
 export default function ThemeRegistry({ children }) {
@@ -15,6 +16,7 @@ export default function ThemeRegistry({ children }) {
     <AppRouterCacheProvider>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <AuthControls />
         {children}
       </ThemeProvider>
     </AppRouterCacheProvider>
